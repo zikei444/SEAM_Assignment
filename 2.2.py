@@ -77,7 +77,6 @@ for p in ax.patches:
                 ha='center', va='bottom', fontsize=8)
 plt.tight_layout()
 plt.show()
-
 # %% [markdown]
 ## **Accuracy Check**
 

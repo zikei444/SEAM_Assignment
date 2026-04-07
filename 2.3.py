@@ -1,5 +1,5 @@
 # %% [markdown]
-## **2.2**
+## **2.3**
 
 # %%
 import numpy as np
@@ -14,6 +14,12 @@ df = pd.read_csv('dirty_financial_transactions.csv')
 # %% [markdown]
 ## **Data Cleanning**
 
+# %% [markdown]
+# **Duplication**
+
+# %%
+# Remove duplicates data
+df = df.drop_duplicates()
 # %% [markdown]
 # **Transaction ID**
 # %%
@@ -44,13 +50,13 @@ df['Transaction_Date'].fillna(df['Transaction_Date'].median(), inplace=True)
 # %% [markdown]
 # **Customer ID**
 # %%
-# Fill missing Customer_ID with the most frequent value (mode)
-df['Customer_ID'].fillna(df['Customer_ID'].mode()[0], inplace=True)
+# Fill missing Customer_ID with a placeholder
+df['Customer_ID'] = df['Customer_ID'].fillna('Missing_ID')
 
 # %% [markdown]
 # **Quantity**
 # %%
-# First, mark negative Quantity as missing
+# Mark negative Quantity as missing
 df.loc[df['Quantity'] < 0, 'Quantity'] = None
 
 # Fill missing Quantity with median - robust to outliers

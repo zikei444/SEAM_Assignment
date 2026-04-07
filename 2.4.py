@@ -13,6 +13,15 @@ warnings.filterwarnings('ignore')
 df_dirty = pd.read_csv('dirty_financial_transactions.csv')
 df = pd.read_csv('cleaned_financial_transactions.csv')
 
+df.head(10)
+# %%
+df.info()
+# %%
+df.describe()
+# %%
+df.shape
+
+# %%
 # Add labels on bar charts
 def add_bar_labels(ax):
     for p in ax.patches:
@@ -48,15 +57,15 @@ for col in original_cols:
     print(f"{col}: Before = {missing_before[col]}, After = {missing_after[col]}")
 
 missing_compare = pd.DataFrame({
-    'Before Cleaning': missing_before,
-    'After Cleaning': missing_after
+    'Before Data Re-engineering': missing_before,
+    'After Data Re-engineering': missing_after
 })
 
 ax = missing_compare.plot(kind='bar', figsize=(12,6))
 
 add_bar_labels(ax)
 
-plt.title('Missing Values Before vs After Cleaning')
+plt.title('Missing Values Before vs After Data Re-engineering')
 plt.ylabel('Count')
 plt.xticks(rotation=45)
 plt.tight_layout()
@@ -80,15 +89,15 @@ print(f"\nUnique Product Names Count: Before = {unique_before_count}, After = {u
 
 fig, axes = plt.subplots(1, 2, figsize=(14,5))
 ax1 = df_dirty['Product_Name'].value_counts().plot(kind='bar', ax=axes[0])
-ax1.set_title('Before Cleaning')
+ax1.set_title('Before Data Re-engineering')
 ax1.tick_params(axis='x', rotation=90, labelsize=6)
 add_bar_labels(ax1)
 
 ax2 = df['Product_Name'].value_counts().plot(kind='bar', ax=axes[1])
-ax2.set_title('After Cleaning')
+ax2.set_title('After Data Re-engineering')
 add_bar_labels(ax2)
 
-plt.suptitle('Product Name Standardization')
+plt.suptitle('Product Name Consistency')
 plt.tight_layout()
 plt.show()
 # %% [markdown]
@@ -105,8 +114,8 @@ print(f"\nUnique Payment Method Count: Before = {unique_before_count}, After = {
 
 
 fig, axes = plt.subplots(1, 2, figsize=(12,5))
-ax1 = df_dirty['Payment_Method'].value_counts().plot(kind='bar', ax=axes[0], title='Before Cleaning')
-ax2 = df['Payment_Method'].value_counts().plot(kind='bar', ax=axes[1], title='After Cleaning')
+ax1 = df_dirty['Payment_Method'].value_counts().plot(kind='bar', ax=axes[0], title='Before Data Re-engineering')
+ax2 = df['Payment_Method'].value_counts().plot(kind='bar', ax=axes[1], title='After Data Re-engineering')
 add_bar_labels(ax1)
 add_bar_labels(ax2)
 plt.suptitle('Payment Method Consistency')
@@ -127,11 +136,11 @@ print(f"\nUnique Transaction Status Count: Before = {unique_before_count}, After
 
 fig, axes = plt.subplots(1, 2, figsize=(12,5))
 ax1 = df_dirty['Transaction_Status'].value_counts().plot(kind='bar', ax=axes[0])
-ax1.set_title('Before Cleaning')
+ax1.set_title('Before Data Re-engineering')
 add_bar_labels(ax1)
 
 ax2 = df['Transaction_Status'].value_counts().plot(kind='bar', ax=axes[1])
-ax2.set_title('After Cleaning')
+ax2.set_title('After Data Re-engineering')
 add_bar_labels(ax2)
 
 plt.suptitle('Transaction Status Consistency')
@@ -152,11 +161,11 @@ print(f"Invalid Quantity: Before = {invalid_qty_before}, After = {invalid_qty_af
 
 fig, axes = plt.subplots(1, 2, figsize=(12,5))
 ax1 = df_dirty['Quantity'].plot(kind='hist', bins=30, ax=axes[0])
-ax1.set_title('Before Cleaning')
+ax1.set_title('Before Data Re-engineering')
 add_hist_labels(ax1)
 
 ax2 = df['Quantity'].plot(kind='hist', bins=30, ax=axes[1])
-ax2.set_title('After Cleaning')
+ax2.set_title('After Data Re-engineering')
 add_hist_labels(ax2)
 plt.suptitle('Quantity Distribution (Invalid Values Removed)')
 plt.tight_layout()
@@ -174,11 +183,11 @@ print(f"Invalid Price: Before = {invalid_price_before}, After = {invalid_price_a
 
 fig, axes = plt.subplots(1, 2, figsize=(12,5))
 ax1 = dirty_price.plot(kind='hist', bins=30, ax=axes[0])
-ax1.set_title('Before Cleaning')
+ax1.set_title('Before Data Re-engineering')
 add_hist_labels(ax1)
 
 ax2 = df['Price'].plot(kind='hist', bins=30, ax=axes[1])
-ax2.set_title('After Cleaning')
+ax2.set_title('After Data Re-engineering')
 add_hist_labels(ax2)
 plt.suptitle('Price Distribution (Cleaned)')
 plt.tight_layout()
@@ -196,7 +205,7 @@ print(f"Invalid Dates: Before = {invalid_dates_before}, After = {invalid_dates_a
 fig, ax = plt.subplots()
 bars = ax.bar(['Before', 'After'], [invalid_dates_before, invalid_dates_after])
 add_bar_labels(ax)
-plt.title('Invalid Dates Before vs After Cleaning')
+plt.title('Invalid Dates Before vs After Data Re-engineering')
 plt.ylabel('Count')
 plt.show()
 

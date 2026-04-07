@@ -10,8 +10,11 @@ warnings.filterwarnings('ignore')
 # %%
 df = pd.read_csv('dirty_financial_transactions.csv')
 df.head(10)
+# %%
 df.info()
+# %%
 df.describe()
+# %%
 df.shape
 # %%
 ### Missing Value
