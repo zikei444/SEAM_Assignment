@@ -136,9 +136,9 @@ plt.pie([invalid_count, valid_dates], labels=['Invalid Dates', 'Valid Dates'], a
 plt.title('Transaction Date Validity')
 plt.show()
 
-### **4. Quantity Accuracy**
+### **Quantity Accuracy**
 
-print("\n4. QUANTITY ACCURACY")
+print("\nQUANTITY ACCURACY")
 
 df['quantity_num'] = pd.to_numeric(df['Quantity'], errors='coerce')
 
@@ -175,10 +175,10 @@ for bar, count in zip(bars, counts):
                  str(count), ha='center', fontsize=10)
 plt.show()
 
-### **5. Price Accuracy**
+### **Price Accuracy**
 
 # %%
-print("\n5. PRICE ACCURACY")
+print("\nPRICE ACCURACY")
 
 # Clean price by removing $ and ,
 df['price_cleaned'] = df['Price'].astype(str).str.replace('$', '').str.replace(',', '')
