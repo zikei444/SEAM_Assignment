@@ -340,6 +340,22 @@ duplicates_before = df_dirty[original_cols].duplicated().sum()
 duplicates_after = df[original_cols].duplicated().sum()
 print(f"\nDuplicate Rows: Before = {duplicates_before}, After = {duplicates_after}")
 
+# Visualize - Duplicates Before vs After
+fig, ax = plt.subplots(figsize=(6, 5))
+issues = ['Before Re-engineering', 'After Re-engineering']
+counts = [duplicates_before, duplicates_after]
+bars = ax.bar(issues, counts)
+
+# add labels
+for bar, count in zip(bars, counts):
+    ax.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 5, 
+            str(count), ha='center', fontsize=10)
+
+plt.title('Duplicate Records Before vs After Re-engineering')
+plt.ylabel('Count')
+plt.tight_layout()
+plt.show()
+
 # %% [markdown]
 ## **Derived Column Quality**
 
