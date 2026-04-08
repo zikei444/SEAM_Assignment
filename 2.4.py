@@ -149,6 +149,312 @@ plt.show()
 
 # %% [markdown]
 ### **Accuracy**
+### **1. Transaction_ID Accuracy Comparison**
+
+# %%
+print("\n1. TRANSACTION ID ACCURACY COMPARISON")
+
+# BEFORE
+expected_pattern = r'^T\d+$' 
+df_dirty['txn_valid_format'] = df_dirty['Transaction_ID'].astype(str).str.match(expected_pattern, na=False)
+
+format_violations_before = (~df_dirty['txn_valid_format']).sum()
+duplicates_before = df_dirty['Transaction_ID'].duplicated().sum()
+nulls_before = df_dirty['Transaction_ID'].isnull().sum()
+
+valid_count_before = len(df_dirty) - (format_violations_before + duplicates_before + nulls_before)
+accuracy_txn_before = (valid_count_before / len(df_dirty)) * 100
+
+# AFTER
+df['txn_valid_format'] = df['Transaction_ID'].astype(str).str.match(expected_pattern, na=False)
+
+format_violations_after = (~df['txn_valid_format']).sum()
+duplicates_after = df['Transaction_ID'].duplicated().sum()
+nulls_after = df['Transaction_ID'].isnull().sum()
+
+valid_count_after = len(df) - (format_violations_after + duplicates_after + nulls_after)
+accuracy_txn_after = (valid_count_after / len(df)) * 100
+
+print(f"\nBEFORE - Total records: {len(df_dirty)}")
+print(f"Format violations: {format_violations_before}")
+print(f"Duplicate IDs: {duplicates_before}")
+print(f"Null values: {nulls_before}")
+print(f"Accuracy: {accuracy_txn_before:.2f}%")
+
+print(f"\nAFTER - Total records: {len(df)}")
+print(f"Format violations: {format_violations_after}")
+print(f"Duplicate IDs: {duplicates_after}")
+print(f"Null values: {nulls_after}")
+print(f"Accuracy: {accuracy_txn_after:.2f}%")
+
+# Visualize - Before vs After
+fig, axes = plt.subplots(1, 2, figsize=(14, 6))
+
+# Before
+categories = ['Valid', 'Format\nViolations', 'Duplicated', 'Null']
+counts_before = [valid_count_before, format_violations_before, duplicates_before, nulls_before]
+colors = ['green', 'red', 'orange', 'gray']
+bars1 = axes[0].bar(categories, counts_before, color=colors)
+axes[0].set_title('BEFORE Data Re-engineering')
+axes[0].set_ylabel('Count', fontsize=12)
+for bar, count in zip(bars1, counts_before):
+    axes[0].text(bar.get_x() + bar.get_width()/2, bar.get_height() + 2, 
+                 str(count), ha='center', va='bottom')
+axes[0].spines['top'].set_visible(False)
+axes[0].spines['right'].set_visible(False)
+
+# After
+counts_after = [valid_count_after, format_violations_after, duplicates_after, nulls_after]
+bars2 = axes[1].bar(categories, counts_after, color=colors)
+axes[1].set_title('AFTER Data Re-engineering')
+axes[1].set_ylabel('Count', fontsize=12)
+for bar, count in zip(bars2, counts_after):
+    axes[1].text(bar.get_x() + bar.get_width()/2, bar.get_height() + 2, 
+                 str(count), ha='center', va='bottom')
+axes[1].spines['top'].set_visible(False)
+axes[1].spines['right'].set_visible(False)
+
+plt.suptitle('Transaction ID Accuracy Comparison', fontsize=14, fontweight='bold')
+plt.tight_layout()
+plt.show()
+
+# %% [markdown]
+### **2. Transaction_Date Accuracy Comparison**
+
+# %%
+print("\n2. TRANSACTION DATE ACCURACY COMPARISON")
+
+# BEFORE
+df_dirty['date_parsed'] = pd.to_datetime(df_dirty['Transaction_Date'], errors='coerce')
+current_date = pd.Timestamp.now()
+
+invalid_dates_before = df_dirty['date_parsed'].isna().sum()
+future_dates_before = (df_dirty['date_parsed'] > current_date).sum()
+valid_dates_before = len(df_dirty) - (invalid_dates_before + future_dates_before)
+accuracy_date_before = (valid_dates_before / len(df_dirty)) * 100
+
+# AFTER
+df['date_parsed'] = pd.to_datetime(df['Transaction_Date'], errors='coerce')
+invalid_dates_after = df['date_parsed'].isna().sum()
+future_dates_after = (df['date_parsed'] > current_date).sum()
+valid_dates_after = len(df) - (invalid_dates_after + future_dates_after)
+accuracy_date_after = (valid_dates_after / len(df)) * 100
+
+print(f"\nBEFORE:")
+print(f"Invalid date formats: {invalid_dates_before}")
+print(f"Future dates: {future_dates_before}")
+print(f"Accuracy: {accuracy_date_before:.2f}%")
+
+print(f"\nAFTER:")
+print(f"Invalid date formats: {invalid_dates_after}")
+print(f"Future dates: {future_dates_after}")
+print(f"Accuracy: {accuracy_date_after:.2f}%")
+
+# Visualize - Before vs After
+fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+
+# Before
+axes[0].bar(['Valid', 'Invalid/Future'], [valid_dates_before, invalid_dates_before + future_dates_before], 
+            color=['green','red'])
+axes[0].set_title('BEFORE Data Re-engineering')
+for i, v in enumerate([valid_dates_before, invalid_dates_before + future_dates_before]):
+    axes[0].text(i, v+5, str(v), ha='center')
+
+# After
+axes[1].bar(['Valid', 'Invalid/Future'], [valid_dates_after, invalid_dates_after + future_dates_after], 
+            color=['green','red'])
+axes[1].set_title('AFTER Data Re-engineering')
+for i, v in enumerate([valid_dates_after, invalid_dates_after + future_dates_after]):
+    axes[1].text(i, v+5, str(v), ha='center')
+
+plt.suptitle('Transaction Date Accuracy Comparison', fontsize=14, fontweight='bold')
+plt.tight_layout()
+plt.show()
+
+# %% [markdown]
+### **3. Customer_ID Accuracy Comparison**
+
+# %%
+print("\n3. CUSTOMER ID ACCURACY COMPARISON")
+
+# BEFORE
+expected_customer_pattern = r'^C\d+$'
+df_dirty['cust_valid_format'] = df_dirty['Customer_ID'].astype(str).str.match(expected_customer_pattern, na=False)
+
+null_cust_before = df_dirty['Customer_ID'].isnull().sum()
+format_invalid_cust_before = (~df_dirty['cust_valid_format']).sum()
+valid_cust_before = len(df_dirty) - (null_cust_before + format_invalid_cust_before)
+accuracy_cust_before = (valid_cust_before / len(df_dirty)) * 100
+
+# AFTER
+df['cust_valid_format'] = df['Customer_ID'].astype(str).str.match(expected_customer_pattern, na=False)
+
+null_cust_after = df['Customer_ID'].isnull().sum()
+format_invalid_cust_after = (~df['cust_valid_format']).sum()
+valid_cust_after = len(df) - (null_cust_after + format_invalid_cust_after)
+accuracy_cust_after = (valid_cust_after / len(df)) * 100
+
+print(f"\nBEFORE:")
+print(f"Null values: {null_cust_before}")
+print(f"Format violations: {format_invalid_cust_before}")
+print(f"Unique customers: {df_dirty['Customer_ID'].nunique()}")
+print(f"Accuracy: {accuracy_cust_before:.2f}%")
+
+print(f"\nAFTER:")
+print(f"Null values: {null_cust_after}")
+print(f"Format violations: {format_invalid_cust_after}")
+print(f"Unique customers: {df['Customer_ID'].nunique()}")
+print(f"Accuracy: {accuracy_cust_after:.2f}%")
+
+# Visualize - Before vs After
+fig, axes = plt.subplots(1, 2, figsize=(14, 6))
+
+# Before
+cust_status = ['Valid', 'Null', 'Invalid Format']
+counts_before = [valid_cust_before, null_cust_before, format_invalid_cust_before]
+colors = ['green', 'gray', 'red']
+bars1 = axes[0].bar(cust_status, counts_before, color=colors)
+axes[0].set_title('BEFORE Data Re-engineering')
+axes[0].set_ylabel('Count')
+for bar, count in zip(bars1, counts_before):
+    if count > 0:
+        axes[0].text(bar.get_x() + bar.get_width()/2, bar.get_height() + 5, str(count), ha='center')
+
+# After
+counts_after = [valid_cust_after, null_cust_after, format_invalid_cust_after]
+bars2 = axes[1].bar(cust_status, counts_after, color=colors)
+axes[1].set_title('AFTER Data Re-engineering')
+axes[1].set_ylabel('Count')
+for bar, count in zip(bars2, counts_after):
+    if count > 0:
+        axes[1].text(bar.get_x() + bar.get_width()/2, bar.get_height() + 5, str(count), ha='center')
+
+plt.suptitle('Customer ID Accuracy Comparison', fontsize=14, fontweight='bold')
+plt.tight_layout()
+plt.show()
+
+# %% [markdown]
+### **4. Quantity Accuracy Comparison**
+
+# %%
+print("\n4. QUANTITY ACCURACY COMPARISON")
+
+# BEFORE
+df_dirty['quantity_num'] = pd.to_numeric(df_dirty['Quantity'], errors='coerce')
+nulls_qty_before = df_dirty['Quantity'].isnull().sum()
+negative_qty_before = (df_dirty['quantity_num'] < 0).sum()
+valid_qty_before = len(df_dirty) - (nulls_qty_before + negative_qty_before)
+accuracy_qty_before = (valid_qty_before / len(df_dirty)) * 100
+
+# AFTER
+df['quantity_num'] = pd.to_numeric(df['Quantity'], errors='coerce')
+nulls_qty_after = df['Quantity'].isnull().sum()
+negative_qty_after = (df['quantity_num'] < 0).sum()
+valid_qty_after = len(df) - (nulls_qty_after + negative_qty_after)
+accuracy_qty_after = (valid_qty_after / len(df)) * 100
+
+print(f"\nBEFORE:")
+print(f"Null values: {nulls_qty_before}")
+print(f"Negative quantities: {negative_qty_before}")
+print(f"Accuracy: {accuracy_qty_before:.2f}%")
+
+print(f"\nAFTER:")
+print(f"Null values: {nulls_qty_after}")
+print(f"Negative quantities: {negative_qty_after}")
+print(f"Accuracy: {accuracy_qty_after:.2f}%")
+
+# Visualize - Before vs After
+fig, axes = plt.subplots(1, 2, figsize=(14, 6))
+
+# Before
+issues = ['Valid', 'Null', 'Negative']
+counts_before = [valid_qty_before, nulls_qty_before, negative_qty_before]
+colors = ['green', 'gray', 'orange']
+bars1 = axes[0].bar(issues, counts_before, color=colors)
+axes[0].set_title('BEFORE Data Re-engineering')
+axes[0].set_ylabel('Count')
+for bar, count in zip(bars1, counts_before):
+    if count > 0:
+        axes[0].text(bar.get_x() + bar.get_width()/2, bar.get_height() + 5, 
+                     str(count), ha='center', fontsize=10)
+
+# After
+counts_after = [valid_qty_after, nulls_qty_after, negative_qty_after]
+bars2 = axes[1].bar(issues, counts_after, color=colors)
+axes[1].set_title('AFTER Data Re-engineering')
+axes[1].set_ylabel('Count')
+for bar, count in zip(bars2, counts_after):
+    if count > 0:
+        axes[1].text(bar.get_x() + bar.get_width()/2, bar.get_height() + 5, 
+                     str(count), ha='center', fontsize=10)
+
+plt.suptitle('Quantity Accuracy Comparison', fontsize=14, fontweight='bold')
+plt.tight_layout()
+plt.show()
+
+# %% [markdown]
+### **5. Price Accuracy Comparison**
+
+# %%
+print("\n5. PRICE ACCURACY COMPARISON")
+
+# BEFORE
+df_dirty['price_cleaned'] = df_dirty['Price'].astype(str).str.replace('$', '').str.replace(',', '')
+df_dirty['price_num'] = pd.to_numeric(df_dirty['price_cleaned'], errors='coerce')
+
+nulls_price_before = df_dirty['Price'].isnull().sum()
+negative_price_before = (df_dirty['price_num'] < 0).sum()
+valid_price_before = len(df_dirty) - (nulls_price_before + negative_price_before)
+accuracy_price_before = (valid_price_before / len(df_dirty)) * 100
+
+# AFTER
+df['price_cleaned'] = df['Price'].astype(str).str.replace('$', '').str.replace(',', '')
+df['price_num'] = pd.to_numeric(df['price_cleaned'], errors='coerce')
+
+nulls_price_after = df['Price'].isnull().sum()
+negative_price_after = (df['price_num'] < 0).sum()
+valid_price_after = len(df) - (nulls_price_after + negative_price_after)
+accuracy_price_after = (valid_price_after / len(df)) * 100
+
+print(f"\nBEFORE:")
+print(f"Null values: {nulls_price_before}")
+print(f"Negative prices: {negative_price_before}")
+print(f"Accuracy: {accuracy_price_before:.2f}%")
+
+print(f"\nAFTER:")
+print(f"Null values: {nulls_price_after}")
+print(f"Negative prices: {negative_price_after}")
+print(f"Accuracy: {accuracy_price_after:.2f}%")
+
+# Visualize - Before vs After
+fig, axes = plt.subplots(1, 2, figsize=(14, 6))
+
+# Before
+issues = ['Valid', 'Null', 'Negative']
+counts_before = [valid_price_before, nulls_price_before, negative_price_before]
+colors = ['green', 'gray', 'orange']
+bars1 = axes[0].bar(issues, counts_before, color=colors)
+axes[0].set_title('BEFORE Data Re-engineering')
+axes[0].set_ylabel('Count')
+for bar, count in zip(bars1, counts_before):
+    if count > 0:
+        axes[0].text(bar.get_x() + bar.get_width()/2, bar.get_height() + 5, 
+                     str(count), ha='center', fontsize=10)
+
+# After
+counts_after = [valid_price_after, nulls_price_after, negative_price_after]
+bars2 = axes[1].bar(issues, counts_after, color=colors)
+axes[1].set_title('AFTER Data Re-engineering')
+axes[1].set_ylabel('Count')
+for bar, count in zip(bars2, counts_after):
+    if count > 0:
+        axes[1].text(bar.get_x() + bar.get_width()/2, bar.get_height() + 5, 
+                     str(count), ha='center', fontsize=10)
+
+plt.suptitle('Price Accuracy Comparison', fontsize=14, fontweight='bold')
+plt.tight_layout()
+plt.show()
+
 
 # %% [markdown]
 # **Quantity**
