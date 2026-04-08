@@ -80,6 +80,9 @@ plt.tight_layout()
 plt.show()
 # %% [markdown]
 ## **Accuracy Check**
+display_columns = ['Transaction_ID', 'Transaction_Date', 'Customer_ID', 
+                   'Product_Name', 'Quantity', 'Price', 'Payment_Method', 
+                   'Transaction_Status']
 
 # %%
 # Invalid Quantity
@@ -133,135 +136,6 @@ plt.pie([invalid_count, valid_dates], labels=['Invalid Dates', 'Valid Dates'], a
 plt.title('Transaction Date Validity')
 plt.show()
 
-# =================
-### **1. Transaction_ID Accuracy**
-print("\n1. TRANSACTION ID ACCURACY")
-
-# T followed by any digits
-expected_pattern = r'^T\d+$' 
-df['txn_valid_format'] = df['Transaction_ID'].astype(str).str.match(expected_pattern, na=False)
-
-format_violations = (~df['txn_valid_format']).sum()
-duplicates = df['Transaction_ID'].duplicated().sum()
-nulls = df['Transaction_ID'].isnull().sum()
-
-print(f"Total records: {len(df)}")
-print(f"Format violations: {format_violations}")
-print(f"Duplicate IDs: {duplicates}")
-print(f"Null values: {nulls}")
-
-valid_count = len(df) - (format_violations + duplicates + nulls)
-accuracy_txn = (valid_count / len(df)) * 100
-print(f"\n Accuracy: {accuracy_txn:.2f}%")
-
-display_columns = ['Transaction_ID', 'Transaction_Date', 'Customer_ID', 
-                   'Product_Name', 'Quantity', 'Price', 'Payment_Method', 
-                   'Transaction_Status']
-
-txn_violations = df[~df['txn_valid_format'] | 
-                    df['Transaction_ID'].duplicated() | 
-                    df['Transaction_ID'].isnull()]
-
-print(f"\n 5 Example Records with Transaction_ID Violations:")
-print(txn_violations[display_columns].head(5).to_string(index=True))
-
-# Visualize
-fig, ax = plt.subplots(figsize=(10, 6))
-
-categories = ['Valid Format', 'Format\nViolations', 'Duplicated', 'Null/Missing']
-counts = [valid_count, format_violations, duplicates, nulls]
-colors = ['green', 'red', 'orange', 'gray']
-
-bars = ax.bar(categories, counts, color=colors)
-ax.set_title('Transaction ID Accuracy')
-ax.set_ylabel('Count', fontsize=12)
-
-for bar, count in zip(bars, counts):
-    ax.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 2, 
-            str(count), ha='center', va='bottom')
-
-ax.spines['top'].set_visible(False)
-ax.spines['right'].set_visible(False)
-plt.tight_layout()
-plt.show()
-
-### **2. Transaction_Date Accuracy**
-
-print("\n2. TRANSACTION DATE ACCURACY")
-
-df['date_parsed'] = pd.to_datetime(df['Transaction_Date'], errors='coerce')
-current_date = pd.Timestamp.now()
-
-invalid_dates = df['date_parsed'].isna().sum()
-future_dates = (df['date_parsed'] > current_date).sum()
-
-print(f"Invalid date formats: {invalid_dates}")
-print(f"Future dates: {future_dates}")
-
-valid_dates = len(df) - (invalid_dates + future_dates)
-accuracy_date = (valid_dates / len(df)) * 100
-print(f"\n Accuracy: {accuracy_date:.2f}%")
-
-print("\n 5 Example Records with Transaction_Date Violations:")
-date_violations = df[(df['date_parsed'].isna()) | (df['date_parsed'] > current_date)]
-if len(date_violations) > 0:
-    pd.set_option('display.max_columns', None)
-    pd.set_option('display.width', None)
-    print(date_violations[display_columns].head(5).to_string(index=True))
-else:
-    print("No date violations found")
-
-# Visualize
-fig, ax = plt.subplots(figsize=(6,4))
-ax.bar(['Valid', 'Invalid/Future'], [valid_dates, invalid_dates+future_dates], 
-       color=['green','red'])
-ax.set_title('Transaction Date Accuracy')
-for i, v in enumerate([valid_dates, invalid_dates+future_dates]):
-    ax.text(i, v+5, str(v), ha='center')
-plt.show()
-
-### **3. Customer_ID Accuracy**
-
-print("\n3. CUSTOMER ID ACCURACY")
-
-# C followed by digits
-expected_customer_pattern = r'^C\d+$'
-df['cust_valid_format'] = df['Customer_ID'].astype(str).str.match(expected_customer_pattern, na=False)
-
-null_cust = df['Customer_ID'].isnull().sum()
-format_invalid_cust = (~df['cust_valid_format']).sum()
-unique_customers = df['Customer_ID'].nunique()
-
-print(f"Null values: {null_cust}")
-print(f"Format violations (not C + digits): {format_invalid_cust}")
-print(f"Unique customers: {unique_customers}")
-
-valid_cust = len(df) - (null_cust + format_invalid_cust)
-accuracy_cust = (valid_cust / len(df)) * 100
-print(f"\n Accuracy: {accuracy_cust:.2f}%")
-
-print("\n📋 5 Example Records with Customer_ID Violations:")
-cust_violations = df[(df['Customer_ID'].isnull()) | (~df['cust_valid_format'])]
-if len(cust_violations) > 0:
-    pd.set_option('display.max_columns', None)
-    pd.set_option('display.width', None)
-    print(cust_violations[display_columns].head(5).to_string(index=True))
-else:
-    print("No Customer_ID violations found")
-
-# Visualize
-plt.figure(figsize=(8,5))
-cust_status = ['Valid', 'Null', 'Invalid Format']
-cust_counts = [valid_cust, null_cust, format_invalid_cust]
-colors = ['green', 'gray', 'red']
-bars = plt.bar(cust_status, cust_counts, color=colors)
-plt.title('Customer ID Accuracy')
-plt.ylabel('Count')
-for bar, count in zip(bars, cust_counts):
-    if count > 0:
-        plt.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 5, str(count), ha='center')
-plt.show()
-
 ### **4. Quantity Accuracy**
 
 print("\n4. QUANTITY ACCURACY")
@@ -270,9 +144,8 @@ df['quantity_num'] = pd.to_numeric(df['Quantity'], errors='coerce')
 
 nulls_qty = df['Quantity'].isnull().sum()
 negative_qty = (df['quantity_num'] < 0).sum()
+invalid_qty = negative_qty + nulls_qty
 
-print(f"Null values: {nulls_qty}")
-print(f"Negative quantities: {negative_qty}")
 
 valid_qty = len(df) - (nulls_qty  + negative_qty)
 accuracy_qty = (valid_qty / len(df)) * 100
@@ -291,10 +164,9 @@ else:
 
 # Visualize
 plt.figure(figsize=(10,5))
-issues = ['Valid', 'Null', 'Negative']
-counts = [valid_qty, nulls_qty, negative_qty]
-colors = ['green', 'gray','orange']
-bars = plt.bar(issues, counts, color=colors)
+issues = ['Valid', 'Invalid']
+counts = [valid_qty, invalid_qty]
+bars = plt.bar(issues, counts)
 plt.title('Quantity Accuracy')
 plt.ylabel('Count')
 for bar, count in zip(bars, counts):
@@ -314,15 +186,13 @@ df['price_num'] = pd.to_numeric(df['price_cleaned'], errors='coerce')
 
 nulls_price = df['Price'].isnull().sum()
 negative_price = (df['price_num'] < 0).sum()
-
-print(f"Null values: {nulls_price}")
-print(f"Negative prices: {negative_price}")
+invalid_price = nulls_price + negative_price
 
 valid_price = len(df) - (nulls_price + negative_price)
 accuracy_price = (valid_price / len(df)) * 100
 print(f"\n Accuracy: {accuracy_price:.2f}%")
 
-print("\n📋 5 Example Records with Price Violations:")
+print("\n 5 Example Records with Price Violations:")
 price_violations = df[(df['Price'].isnull()) | 
                       (df['price_num'].isna()) | 
                       (df['price_num'] <= 0)]
@@ -335,10 +205,9 @@ else:
 
 # Visualize
 plt.figure(figsize=(10,5))
-issues = ['Valid', 'Null', 'Negative']
-counts = [valid_price, nulls_price, negative_price]
-colors = ['green', 'gray', 'orange']
-bars = plt.bar(issues, counts, color=colors)
+issues = ['Valid', 'Invalid']
+counts = [valid_price, invalid_price]
+bars = plt.bar(issues, counts)
 plt.title('Price Accuracy')
 plt.ylabel('Count')
 for bar, count in zip(bars, counts):
