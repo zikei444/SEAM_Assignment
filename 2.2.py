@@ -79,7 +79,7 @@ for p in ax.patches:
 plt.tight_layout()
 plt.show()
 # %% [markdown]
-## **Accuracy Check**
+## **Correctness Check**
 display_columns = ['Transaction_ID', 'Transaction_Date', 'Customer_ID', 
                    'Product_Name', 'Quantity', 'Price', 'Payment_Method', 
                    'Transaction_Status']
@@ -136,9 +136,9 @@ plt.pie([invalid_count, valid_dates], labels=['Invalid Dates', 'Valid Dates'], a
 plt.title('Transaction Date Validity')
 plt.show()
 
-### **Quantity Accuracy**
+### **Quantity Correctness**
 
-print("\nQUANTITY ACCURACY")
+print("\nQUANTITY CORRECTNESS")
 
 df['quantity_num'] = pd.to_numeric(df['Quantity'], errors='coerce')
 
@@ -148,8 +148,8 @@ invalid_qty = negative_qty + nulls_qty
 
 
 valid_qty = len(df) - (nulls_qty  + negative_qty)
-accuracy_qty = (valid_qty / len(df)) * 100
-print(f"\n Accuracy: {accuracy_qty:.2f}%")
+correctness_qty = (valid_qty / len(df)) * 100
+print(f"\n Correctness: {correctness_qty:.2f}%")
 
 print("\n 5 Example Records with Quantity Violations:")
 qty_violations = df[(df['Quantity'].isnull()) | 
@@ -167,7 +167,7 @@ plt.figure(figsize=(10,5))
 issues = ['Valid', 'Invalid']
 counts = [valid_qty, invalid_qty]
 bars = plt.bar(issues, counts)
-plt.title('Quantity Accuracy')
+plt.title('Quantity Correctness')
 plt.ylabel('Count')
 for bar, count in zip(bars, counts):
     if count > 0:
@@ -175,10 +175,10 @@ for bar, count in zip(bars, counts):
                  str(count), ha='center', fontsize=10)
 plt.show()
 
-### **Price Accuracy**
+### **Price Correctness**
 
 # %%
-print("\nPRICE ACCURACY")
+print("\nPRICE CORRECTNESS")
 
 # Clean price by removing $ and ,
 df['price_cleaned'] = df['Price'].astype(str).str.replace('$', '').str.replace(',', '')
@@ -189,8 +189,8 @@ negative_price = (df['price_num'] < 0).sum()
 invalid_price = nulls_price + negative_price
 
 valid_price = len(df) - (nulls_price + negative_price)
-accuracy_price = (valid_price / len(df)) * 100
-print(f"\n Accuracy: {accuracy_price:.2f}%")
+correctness_price = (valid_price / len(df)) * 100
+print(f"\n Correctness: {correctness_price:.2f}%")
 
 print("\n 5 Example Records with Price Violations:")
 price_violations = df[(df['Price'].isnull()) | 
@@ -208,13 +208,48 @@ plt.figure(figsize=(10,5))
 issues = ['Valid', 'Invalid']
 counts = [valid_price, invalid_price]
 bars = plt.bar(issues, counts)
-plt.title('Price Accuracy')
+plt.title('Price Correctness')
 plt.ylabel('Count')
 for bar, count in zip(bars, counts):
     if count > 0:
         plt.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 5, 
                  str(count), ha='center', fontsize=10)
 plt.show()
+
+### **Transaction_Date Correctness**
+
+print("\nTRANSACTION DATE CORRECTNESS")
+
+df['date_parsed'] = pd.to_datetime(df['Transaction_Date'], errors='coerce')
+current_date = pd.Timestamp.now()
+
+invalid_dates = df['date_parsed'].isna().sum()
+future_dates = (df['date_parsed'] > current_date).sum()
+
+print(f"Invalid date formats: {invalid_dates}")
+print(f"Future dates: {future_dates}")
+
+valid_dates = len(df) - (invalid_dates + future_dates)
+correctness_date = (valid_dates / len(df)) * 100
+print(f"\n Correctness: {correctness_date:.2f}%")
+
+print("\n 5 Example Records with Transaction_Date Violations:")
+date_violations = df[(df['date_parsed'].isna()) | (df['date_parsed'] > current_date)]
+if len(date_violations) > 0:
+    pd.set_option('display.max_columns', None)
+    pd.set_option('display.width', None)
+    print(date_violations[display_columns].head(5).to_string(index=True))
+else:
+    print("No date violations found")
+
+# Visualize
+fig, ax = plt.subplots(figsize=(6,4))
+ax.bar(['Valid', 'Invalid/Future'], [valid_dates, invalid_dates+future_dates])
+ax.set_title('Transaction Date Correctness')
+for i, v in enumerate([valid_dates, invalid_dates+future_dates]):
+    ax.text(i, v+5, str(v), ha='center')
+plt.show()
+
 
 # %% [markdown]
 ## **Duplication Record Analysis**

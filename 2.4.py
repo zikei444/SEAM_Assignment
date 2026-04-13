@@ -148,11 +148,12 @@ plt.tight_layout()
 plt.show()
 
 # %% [markdown]
-### **Accuracy**
-### ** Quantity Accuracy Comparison**
+### **Correctness**
+# %% [markdown]
+# **Quantity**
 
 # %%
-print("\n QUANTITY ACCURACY COMPARISON")
+print("\n QUANTITY CORRECTNESS COMPARISON")
 
 # BEFORE
 df_dirty['quantity_num'] = pd.to_numeric(df_dirty['Quantity'], errors='coerce')
@@ -160,7 +161,7 @@ nulls_qty_before = df_dirty['Quantity'].isnull().sum()
 negative_qty_before = (df_dirty['quantity_num'] < 0).sum()
 valid_qty_before = len(df_dirty) - (nulls_qty_before + negative_qty_before)
 invalid_qty_before = nulls_qty_before + negative_qty_before
-accuracy_qty_before = (valid_qty_before / len(df_dirty)) * 100
+correctness_qty_before = (valid_qty_before / len(df_dirty)) * 100
 
 # AFTER
 df['quantity_num'] = pd.to_numeric(df['Quantity'], errors='coerce')
@@ -168,17 +169,20 @@ nulls_qty_after = df['Quantity'].isnull().sum()
 negative_qty_after = (df['quantity_num'] < 0).sum()
 invalid_qty_after = nulls_qty_after + negative_qty_after
 valid_qty_after = len(df) - (nulls_qty_after + negative_qty_after)
-accuracy_qty_after = (valid_qty_after / len(df)) * 100
+correctness_qty_after = (valid_qty_after / len(df)) * 100
+improvement_quantity = correctness_qty_after - correctness_qty_before
 
 print(f"\nBEFORE:")
 print(f"Invalid values: {invalid_qty_before}")
 print(f"Valid values: {valid_qty_before}")
-print(f"Accuracy: {accuracy_qty_before:.2f}%")
+print(f"Correctness: {correctness_qty_before:.2f}%")
 
 print(f"\nAFTER:")
 print(f"Invalid values: {invalid_qty_after}")
 print(f"Valid values: {valid_qty_after}")
-print(f"Accuracy: {accuracy_qty_after:.2f}%")
+print(f"Correctness: {correctness_qty_after:.2f}%")
+print(f"\nIMPROVEMENT:")
+print(f"Increase in Correctness: {improvement_quantity:.2f}%")
 
 # Visualize - Before vs After
 fig, axes = plt.subplots(1, 2, figsize=(14, 6))
@@ -204,15 +208,14 @@ for bar, count in zip(bars2, counts_after):
         axes[1].text(bar.get_x() + bar.get_width()/2, bar.get_height() + 5, 
                      str(count), ha='center', fontsize=10)
 
-plt.suptitle('Quantity Accuracy Comparison', fontsize=14, fontweight='bold')
+plt.suptitle('Quantity Correctness Comparison', fontsize=14)
 plt.tight_layout()
 plt.show()
-
 # %% [markdown]
-### **5. Price Accuracy Comparison**
+# **Price**
 
 # %%
-print("PRICE ACCURACY COMPARISON")
+print("PRICE CORRECTNESS COMPARISON")
 
 # BEFORE
 df_dirty['price_cleaned'] = df_dirty['Price'].astype(str).str.replace('$', '').str.replace(',', '')
@@ -222,7 +225,7 @@ nulls_price_before = df_dirty['Price'].isnull().sum()
 negative_price_before = (df_dirty['price_num'] < 0).sum()
 invalid_price_before = nulls_price_before + negative_price_before
 valid_price_before = len(df_dirty) - invalid_price_before
-accuracy_price_before = (valid_price_before / len(df_dirty)) * 100
+correctness_price_before = (valid_price_before / len(df_dirty)) * 100
 
 # AFTER
 df['price_cleaned'] = df['Price'].astype(str).str.replace('$', '').str.replace(',', '')
@@ -232,17 +235,21 @@ nulls_price_after = df['Price'].isnull().sum()
 negative_price_after = (df['price_num'] < 0).sum()
 invalid_price_after = nulls_price_after + negative_price_after
 valid_price_after = len(df) - invalid_price_after
-accuracy_price_after = (valid_price_after / len(df)) * 100
+correctness_price_after = (valid_price_after / len(df)) * 100
+improvement_price = correctness_price_after - correctness_price_before
 
 print(f"\nBEFORE:")
 print(f"Invalid values: {invalid_price_before}")
-print(f"Accuracy: {accuracy_price_before:.2f}%")
+print(f"Correctness: {correctness_price_before:.2f}%")
 
 print(f"\nAFTER:")
 print(f"Invalid values: {invalid_price_after}") 
-print(f"Accuracy: {accuracy_price_after:.2f}%")
+print(f"Correctness: {correctness_price_after:.2f}%")
 
-# Visualize - Before vs After
+print(f"\nIMPROVEMENT:")
+print(f"Increase in Correctness: {improvement_price:.2f}%")
+
+# Visualize
 fig, axes = plt.subplots(1, 2, figsize=(14, 6))
 
 # Before
@@ -266,70 +273,84 @@ for bar, count in zip(bars2, counts_after):
         axes[1].text(bar.get_x() + bar.get_width()/2, bar.get_height() + 5, 
                      str(count), ha='center', fontsize=10)
 
-plt.suptitle('Price Accuracy Comparison', fontsize=14, fontweight='bold')
+plt.suptitle('Price Correctness Comparison', fontsize=14)
 plt.tight_layout()
 plt.show()
-
-
 # %% [markdown]
-# **Quantity**
+# **Transaction_Date**
 
 # %%
-invalid_qty_before = ((df_dirty['Quantity'] <= 0) | (df_dirty['Quantity'].isnull())).sum()
-invalid_qty_after = ((df['Quantity'] <= 0) | (df['Quantity'].isnull())).sum()
-print(f"\nQuantity Accuracy:")
-print(f"Invalid Quantity: Before = {invalid_qty_before}, After = {invalid_qty_after}")
+print("TRANSACTION DATE CORRECTNESS COMPARISON")
 
-fig, axes = plt.subplots(1, 2, figsize=(12,5))
-ax1 = df_dirty['Quantity'].plot(kind='hist', bins=30, ax=axes[0])
-ax1.set_title('Before Data Re-engineering')
-add_hist_labels(ax1)
+# BEFORE
+df_dirty['date_parsed'] = pd.to_datetime(df_dirty['Transaction_Date'], errors='coerce')
+current_date = pd.Timestamp.now()
 
-ax2 = df['Quantity'].plot(kind='hist', bins=30, ax=axes[1])
-ax2.set_title('After Data Re-engineering')
-add_hist_labels(ax2)
-plt.suptitle('Quantity Distribution (Invalid Values Removed)')
+invalid_dates_before = df_dirty['date_parsed'].isna().sum()
+future_dates_before = (df_dirty['date_parsed'] > current_date).sum()
+valid_dates_before = len(df_dirty) - (invalid_dates_before + future_dates_before)
+correctness_date_before = (valid_dates_before / len(df_dirty)) * 100
+
+# AFTER
+df['date_parsed'] = pd.to_datetime(df['Transaction_Date'], errors='coerce')
+
+invalid_dates_after = df['date_parsed'].isna().sum()
+future_dates_after = (df['date_parsed'] > current_date).sum()
+valid_dates_after = len(df) - (invalid_dates_after + future_dates_after)
+correctness_date_after = (valid_dates_after / len(df)) * 100
+improvement_date = correctness_date_after - correctness_date_before
+
+
+print(f"\nBEFORE:")
+print(f"Invalid date formats: {invalid_dates_before}")
+print(f"Future dates: {future_dates_before}")
+print(f"Correctness: {correctness_date_before:.2f}%")
+
+print(f"\nAFTER:")
+print(f"Invalid date formats: {invalid_dates_after}")
+print(f"Future dates: {future_dates_after}")
+print(f"Correctness: {correctness_date_after:.2f}%")
+
+print(f"\nIMPROVEMENT:")
+print(f"Increase in Correctness: {improvement_date:.2f}%")
+
+
+# VISUALIZATION
+fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+
+# BEFORE
+axes[0].bar(
+    ['Valid', 'Invalid/Future'],
+    [valid_dates_before, invalid_dates_before + future_dates_before]
+)
+
+axes[0].set_title('BEFORE Data Re-engineering')
+
+before_counts = [valid_dates_before, invalid_dates_before + future_dates_before]
+before_pcts = [correctness_date_before, 100 - correctness_date_before]
+
+for i, (count, pct) in enumerate(zip(before_counts, before_pcts)):
+    axes[0].text(i, count, str(count), ha='center')
+    axes[0].text(i, count + max(before_counts)*0.02, f"{pct:.2f}%", ha='center')
+
+# AFTER
+axes[1].bar(
+    ['Valid', 'Invalid/Future'],
+    [valid_dates_after, invalid_dates_after + future_dates_after]
+)
+
+axes[1].set_title('AFTER Data Re-engineering')
+
+after_counts = [valid_dates_after, invalid_dates_after + future_dates_after]
+after_pcts = [correctness_date_after, 100 - correctness_date_after]
+
+for i, (count, pct) in enumerate(zip(after_counts, after_pcts)):
+    axes[1].text(i, count, str(count), ha='center')
+    axes[1].text(i, count + max(after_counts)*0.02, f"{pct:.2f}%", ha='center')
+
+plt.suptitle('Transaction Date Correctness Comparison', fontsize=14, fontweight='bold')
 plt.tight_layout()
 plt.show()
-
-# %% [markdown]
-# **Price**
-
-# %%
-dirty_price = pd.to_numeric(df_dirty['Price'], errors='coerce')
-invalid_price_before = (dirty_price <= 0).sum()
-invalid_price_after = (df['Price'] <= 0).sum()
-print(f" Price Accuracy")
-print(f"Invalid Price: Before = {invalid_price_before}, After = {invalid_price_after}")
-
-fig, axes = plt.subplots(1, 2, figsize=(12,5))
-ax1 = dirty_price.plot(kind='hist', bins=30, ax=axes[0])
-ax1.set_title('Before Data Re-engineering')
-add_hist_labels(ax1)
-
-ax2 = df['Price'].plot(kind='hist', bins=30, ax=axes[1])
-ax2.set_title('After Data Re-engineering')
-add_hist_labels(ax2)
-plt.suptitle('Price Distribution (Cleaned)')
-plt.tight_layout()
-plt.show()
-
-# %% [markdown]
-# **Transaction Date**
-
-# %%
-invalid_dates_before = pd.to_datetime(df_dirty['Transaction_Date'], errors='coerce').isnull().sum()
-invalid_dates_after = df['Transaction_Date'].isnull().sum()
-print(f"Transaction Date Accuracy:")
-print(f"Invalid Dates: Before = {invalid_dates_before}, After = {invalid_dates_after}")
-
-fig, ax = plt.subplots()
-bars = ax.bar(['Before', 'After'], [invalid_dates_before, invalid_dates_after])
-add_bar_labels(ax)
-plt.title('Invalid Dates Before vs After Data Re-engineering')
-plt.ylabel('Count')
-plt.show()
-
 # %% [markdown]
 ## **Duplicate Reocrd**
 
