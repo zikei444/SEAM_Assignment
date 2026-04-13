@@ -36,7 +36,7 @@ plt.figure()
 plt.pie([dup, unique],
         labels=['Duplicate', 'Unique'],
         autopct='%1.1f%%')
-plt.title("Duplicate Records Distribution")
+plt.title("Duplicate Records")
 plt.show()
 
 # Sales Accuracy Check
