@@ -40,7 +40,6 @@ plt.title("Duplicate Records Distribution")
 plt.show()
 
 # Sales Accuracy Check
-
 df['Unit price'] = pd.to_numeric(df['Unit price'], errors='coerce')
 df['Quantity'] = pd.to_numeric(df['Quantity'], errors='coerce')
 df['Tax 5%'] = pd.to_numeric(df['Tax 5%'], errors='coerce')
