@@ -165,7 +165,7 @@ replace_name = {
 # replacing using lowercase column
 df['Product_Name_temp'] = df['Product_Name_temp'].replace(replace_name)
 
-# Converting back to capital latter
+# Converting back to capital letter
 df['Product_Name'] = df['Product_Name_temp'].str.title()
 
 #Drop temporary column
