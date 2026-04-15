@@ -51,3 +51,5 @@ for i, v in enumerate(values):
 
 plt.tight_layout()
 plt.show()
+
+df.to_csv('cleaned_supermarket_sales.csv', index=False)
