@@ -36,48 +36,32 @@ print("Duplicate rows:", df.duplicated().sum())
 duplicates = df[df.duplicated()]
 print(duplicates.head())
 
-# %%
-# Inconsistency
-# %%
-categorical_cols = ['Branch', 'City', 'Customer type', 'Gender',
-                    'Product line', 'Payment']
-
-for col in categorical_cols:
-    print(f"\n{col} unique values:")
-    print(df[col].unique())
-
-# Invalid Invoice ID
-# %%
-print("Missing Invoice ID:", df['Invoice ID'].isnull().sum())
-
 # Invalid Quantity
 # %%
-print("Invalid Quantity:")
+print("Invalid or Missing Quantity:")
 
-df['Quantity'] = pd.to_numeric(df['Quantity'], errors='coerce')
-print(df[df['Quantity'] <= 0])
+invalid_quantity = df[
+    (df['Quantity'] <= 0) | (df['Quantity'].isnull())
+]
+
+print(invalid_quantity)
 
 # Invalid Unit Price
 # %%
-print("Invalid Unit Price:")
+print("Invalid or Missing Unit Price:")
 
-df['Unit price'] = pd.to_numeric(df['Unit price'], errors='coerce')
-print(df[df['Unit price'] <= 0])
+invalid_unit_price = df[
+    (df['Unit price'] <= 0) | (df['Unit price'].isnull())
+]
 
-# %%
+print("Invalid or Missing Tax:")
+
+invalid_tax = df[
+    (df['Tax 5%'] <= 0) | (df['Tax 5%'].isnull())
+]
 # %%
 print("Invalid Sales:")
 
 df['Sales'] = pd.to_numeric(df['Sales'], errors='coerce')
-print(df[df['Sales'] <= 0])
-
-# %%
-# Invalid Date Format
-# %%
-temp_date = pd.to_datetime(df['Date'], errors='coerce')
-
-invalid_dates = df[temp_date.isnull()]
-
-print("Number of invalid dates:", invalid_dates.shape[0])
-print(invalid_dates['Date'])
+print(df[(df['Sales'] <= 0) | (df['Tax 5%'].isnull())])
 # %%

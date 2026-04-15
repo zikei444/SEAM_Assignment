@@ -11,17 +11,19 @@ df = pd.read_csv('dirty_supermarket_sales.csv')
 
 print("Dataset Shape:", df.shape)
 
-# Missing Values
-missing = df.isnull().sum()
+# Select only the required columns
+cols = ['Quantity', 'Unit price', 'Tax 5%', 'Sales']
+
+missing = df[cols].isnull().sum()
 print("\nMissing Values:\n", missing)
 
 plt.figure(figsize=(8,5))
-ax = missing.plot(kind='bar')
-plt.title("Missing Values Per Column")
+missing.plot(kind='bar')
+plt.title("Missing Values in Key Columns")
 plt.ylabel("Count")
 
 for i, v in enumerate(missing):
-    ax.text(i, v, str(v), ha='center', va='bottom')
+    plt.text(i, v, str(v), ha='center', va='bottom')
 
 plt.tight_layout()
 plt.show()
@@ -53,24 +55,24 @@ sales_error = abs(df['Sales'] - df['expected_sales'])
 
 tolerance = 0.01
 
-invalid_sales = (sales_error > tolerance).sum()
-valid_sales = len(df) - invalid_sales
+incorrect_sales = (sales_error > tolerance).sum()
+valid_sales = len(df) - incorrect_sales
 
 sales_accuracy = (valid_sales / len(df)) * 100
 
 # Results
 print("\nSALES ACCURACY RESULT")
 print(f"Valid Sales Records: {valid_sales}")
-print(f"Invalid Sales Records: {invalid_sales}")
+print(f"Incorrect Sales Records: {incorrect_sales}")
 print(f"Sales Accuracy: {sales_accuracy:.2f}%")
 
 # Visualization
 plt.figure()
-plt.bar(['Valid', 'Invalid'], [valid_sales, invalid_sales])
+plt.bar(['Valid', 'Incorrect'], [valid_sales, incorrect_sales])
 plt.title("Sales Accuracy Check")
 plt.ylabel("Number of Records")
 
-for i, v in enumerate([valid_sales, invalid_sales]):
+for i, v in enumerate([valid_sales, incorrect_sales]):
     plt.text(i, v, str(v), ha='center')
 
 plt.show()

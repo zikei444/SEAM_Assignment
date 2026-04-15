@@ -82,25 +82,12 @@ print(f"Increase in Accuracy: {accuracy_increase:.2f}%")
 
 plt.figure(figsize=(6,4))
 
-counts = [valid_before, valid_after]
+plt.bar(['Before', 'After'], [accuracy_before, accuracy_after])
 
-bars = plt.bar(['Before', 'After'], counts)
+plt.title("Sales Accuracy (%) Comparison")
+plt.ylabel("Accuracy %")
 
-plt.title("Sales Accuracy Comparison")
-plt.ylabel("Number of Valid Records")
-
-total_before = len(df_dirty)
-total_after = len(df_after)
-
-percentages = [accuracy_before, accuracy_after]
-
-for bar, count, pct in zip(bars, counts, percentages):
-    plt.text(
-        bar.get_x() + bar.get_width() / 2,
-        bar.get_height(),
-        f"{count}",
-        ha='center',
-        va='bottom'
-    )
+for i, v in enumerate([accuracy_before, accuracy_after]):
+    plt.text(i, v, f"{v:.2f}%", ha='center', va='bottom')
 
 plt.show()
