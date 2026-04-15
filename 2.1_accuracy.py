@@ -1,5 +1,5 @@
 # %% [markdown]
-## **2.1**
+## **2.1 Accuracy**
 
 # %%
 import numpy as np
@@ -36,6 +36,7 @@ print("Duplicate rows:", df.duplicated().sum())
 duplicates = df[df.duplicated()]
 print(duplicates.head())
 
+# %%
 # Invalid Quantity
 # %%
 print("Invalid or Missing Quantity:")
@@ -46,6 +47,7 @@ invalid_quantity = df[
 
 print(invalid_quantity)
 
+# %%
 # Invalid Unit Price
 # %%
 print("Invalid or Missing Unit Price:")
@@ -54,14 +56,26 @@ invalid_unit_price = df[
     (df['Unit price'] <= 0) | (df['Unit price'].isnull())
 ]
 
+print(invalid_unit_price)
+
+# %%
+# Invalid Tax
+# %%
 print("Invalid or Missing Tax:")
 
 invalid_tax = df[
     (df['Tax 5%'] <= 0) | (df['Tax 5%'].isnull())
 ]
+
+print(invalid_tax)
+
+# %%
+# Invalid Sales
 # %%
 print("Invalid Sales:")
 
 df['Sales'] = pd.to_numeric(df['Sales'], errors='coerce')
-print(df[(df['Sales'] <= 0) | (df['Tax 5%'].isnull())])
-# %%
+
+print(df[
+    (df['Sales'] <= 0) | (df['Sales'].isnull())
+])

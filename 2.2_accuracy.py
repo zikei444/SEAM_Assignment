@@ -1,6 +1,7 @@
 # %% [markdown]
-## **2.2 Accuracy Check**
+## **2.2 Accuracy**
 
+# %%
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -9,6 +10,10 @@ warnings.filterwarnings('ignore')
 
 df = pd.read_csv('dirty_supermarket_sales.csv')
 
+# %% [markdown]
+## **Accuracy Analysis**
+# %%
+missing = df.isnull().sum()
 print("Dataset Shape:", df.shape)
 
 # Select only the required columns
