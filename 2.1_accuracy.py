@@ -22,11 +22,13 @@ df.describe()
 # %%
 df.shape
 
+# %%
 # Missing Values
 # %%
 print("Missing Values:")
 print(df.isnull().sum())
 
+# %%
 # Duplication
 # %%
 print("Duplicate rows:", df.duplicated().sum())
@@ -34,6 +36,7 @@ print("Duplicate rows:", df.duplicated().sum())
 duplicates = df[df.duplicated()]
 print(duplicates.head())
 
+# %%
 # Inconsistency
 # %%
 categorical_cols = ['Branch', 'City', 'Customer type', 'Gender',
@@ -61,6 +64,14 @@ print("Invalid Unit Price:")
 df['Unit price'] = pd.to_numeric(df['Unit price'], errors='coerce')
 print(df[df['Unit price'] <= 0])
 
+# %%
+# %%
+print("Invalid Sales:")
+
+df['Sales'] = pd.to_numeric(df['Sales'], errors='coerce')
+print(df[df['Sales'] <= 0])
+
+# %%
 # Invalid Date Format
 # %%
 temp_date = pd.to_datetime(df['Date'], errors='coerce')
@@ -69,3 +80,4 @@ invalid_dates = df[temp_date.isnull()]
 
 print("Number of invalid dates:", invalid_dates.shape[0])
 print(invalid_dates['Date'])
+# %%

@@ -56,3 +56,4 @@ df = df.sort_values(by='Date').reset_index(drop=True)
 
 # **Save Cleaned Data**
 df.to_csv('cleaned_supermarket_sales.csv', index=False)
+# %%
