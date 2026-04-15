@@ -32,12 +32,6 @@ rows_before = len(df_dirty)
 rows_after = len(df_after)
 rows_removed = rows_before - rows_after
 
-print("ROW COMPARISON")
-print(f"Before Re-engineering: {rows_before}")
-print(f"After Re-engineering: {rows_after}")
-print(f"Rows Removed: {rows_removed}")
-
-
 # **Sales Accuracy Check (Before Cleaning)**
 
 df_dirty['Unit price'] = pd.to_numeric(df_dirty['Unit price'], errors='coerce')
