@@ -38,25 +38,25 @@ accuracy_after = accuracy(valid_after, len(df_clean))
 
 accuracy_increase = accuracy_after - accuracy_before
 
-print("\nSALES ACCURACY")
-print(f"Before Cleaning: {accuracy_before:.2f}%")
-print(f"After Cleaning: {accuracy_after:.2f}%")
-print(f"Improvement: {accuracy_increase:.2f}%")
+df_dirty['expected_sales'] = expected_before
+df_dirty['is_correct'] = abs(df_dirty['Sales'] - df_dirty['expected_sales']) <= 0.01
 
-plt.figure(figsize=(6,4))
+# Keep only rows that still exist in cleaned dataset
+valid_indices = df_dirty.index.intersection(df_clean.index)
 
-values = [accuracy_before, accuracy_after]
-labels = ['Before', 'After']
+df_dirty_valid = df_dirty.loc[valid_indices]
+df_clean_valid = df_clean.loc[valid_indices]
 
-plt.bar(labels, values)
+# Get indices
+correct_idx = df_dirty_valid[df_dirty_valid['is_correct']].index[:5]
+incorrect_idx = df_dirty_valid[~df_dirty_valid['is_correct']].index[:5]
 
-plt.title("Sales Accuracy")
-plt.ylabel("Accuracy %")
+# Get cleaned records and include calculated_sales
+cols = ['Unit price', 'Quantity', 'Tax 5%', 'Sales', 'calculated_sales']
 
-for i, v in enumerate(values):
-    plt.text(i, v, f"{v:.2f}%", ha='center', va='bottom')
+correct_samples = df_clean_valid.loc[correct_idx][cols]
+incorrect_samples = df_clean_valid.loc[incorrect_idx][cols]
 
-plt.ylim(0, 100)
-
-plt.tight_layout()
-plt.show()
+print("\n--- 5 SAMPLE RECORDS ---")
+print(incorrect_samples)
+# %%

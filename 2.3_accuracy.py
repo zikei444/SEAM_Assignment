@@ -8,6 +8,7 @@ import warnings
 warnings.filterwarnings('ignore')
 
 df = pd.read_csv('dirty_supermarket_sales.csv')
+
 # %% [markdown]
 ## **Data Cleaning**
 
@@ -21,14 +22,19 @@ df = df.dropna()
 # Remove duplicates data
 df = df.drop_duplicates()
 
+# Ensure numeric columns
 df['Unit price'] = pd.to_numeric(df['Unit price'], errors='coerce')
 df['Quantity'] = pd.to_numeric(df['Quantity'], errors='coerce')
 
 # %%
-# calculate Total_Amount, Tax 5% and Sales
+# calculate Total_Amount, Tax 5% and calculated_sales
 df['Total_Amount'] = df['Unit price'] * df['Quantity']
 df['Tax 5%'] = df['Total_Amount'] * 0.05
-df['Sales'] = df['Total_Amount'] + df['Tax 5%']
+# %%
+# Recalculate Sales based on Total_Amount and Tax 5%
+# %%
+# Saved in a new column 'calculated_sales' to compare with original 'Sales'
+df['calculated_sales'] = df['Total_Amount'] + df['Tax 5%']
 
 # %% [markdown]
 ## **Sorting and Index Reset**
