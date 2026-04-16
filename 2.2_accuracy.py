@@ -53,31 +53,18 @@ df['Tax 5%'] = pd.to_numeric(df['Tax 5%'], errors='coerce')
 df['Sales'] = pd.to_numeric(df['Sales'], errors='coerce')
 
 # Sales formula
-df['expected_sales'] = (df['Unit price'] * df['Quantity']) + df['Tax 5%']
+df['calculated_sales'] = (df['Unit price'] * df['Quantity']) + df['Tax 5%']
 
-# Error calculation
-sales_error = abs(df['Sales'] - df['expected_sales'])
-
+# Identify incorrect sales
+sales_error = abs(df['Sales'] - df['calculated_sales'])
 tolerance = 0.01
 
-incorrect_sales = (sales_error > tolerance).sum()
-valid_sales = len(df) - incorrect_sales
+df['is_incorrect'] = sales_error > tolerance
 
-sales_accuracy = (valid_sales / len(df)) * 100
+# Get 10 incorrect samples
+incorrect_samples = df[df['is_incorrect']].head(10)
 
-# Results
-print("\nSALES ACCURACY RESULT")
-print(f"Valid Sales Records: {valid_sales}")
-print(f"Incorrect Sales Records: {incorrect_sales}")
-print(f"Sales Accuracy: {sales_accuracy:.2f}%")
+print("\n--- 10 INCORRECT SALES RECORDS ---")
+cols = ['Unit price', 'Quantity', 'Tax 5%', 'Sales', 'calculated_sales']
 
-# Visualization
-plt.figure()
-plt.bar(['Valid', 'Incorrect'], [valid_sales, incorrect_sales])
-plt.title("Sales Accuracy Check")
-plt.ylabel("Number of Records")
-
-for i, v in enumerate([valid_sales, incorrect_sales]):
-    plt.text(i, v, str(v), ha='center')
-
-plt.show()
+print(incorrect_samples[cols])
