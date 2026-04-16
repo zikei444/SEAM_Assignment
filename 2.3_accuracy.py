@@ -33,10 +33,25 @@ df['Tax 5%'] = df['Total_Amount'] * 0.05
 # %%
 # Saved in a new column 'calculated_sales' to compare with original 'Sales'
 df['calculated_sales'] = df['Total_Amount'] + df['Tax 5%']
-
-# %% [markdown]
-## **Sorting and Index Reset**
+# %%
+# Sorting and Index Reset
 df = df.sort_values(by='Date').reset_index(drop=True)
+
+# Error calculation
+df['error'] = abs(df['Sales'] - df['calculated_sales'])
+
+tolerance = 0.01
+
+df['is_incorrect'] = df['error'] > tolerance
+
+# Get 10 incorrect samples
+incorrect_samples = df[df['is_incorrect']].head(10)
+
+# Columns to display
+cols = ['Unit price', 'Quantity', 'Tax 5%', 'Sales', 'calculated_sales']
+
+print("\n--- 10 INCORRECT SALES RECORDS ---")
+print(incorrect_samples[cols])
 
 rows_after = df.shape[0]
 missing_after = df.isnull().sum().sum()
