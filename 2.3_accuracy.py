@@ -12,9 +12,7 @@ df = pd.read_csv('dirty_supermarket_sales.csv')
 # %% [markdown]
 ## **Data Cleaning**
 
-rows_before = df.shape[0]
-missing_before = df.isnull().sum().sum()
-
+# %%
 # Remove missing values
 df = df.dropna()
 
